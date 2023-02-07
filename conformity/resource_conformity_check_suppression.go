@@ -41,7 +41,8 @@ func resourceConformityCheckSuppression() *schema.Resource {
 			},
 			"service": {
 				Type:        schema.TypeString,
-				Required:    false,
+				Optional:    true,
+				Default: 	 "",
 				Description: "Name of the service of the rule. Example: 'Resources'",
 				ForceNew:    true,
 			},
