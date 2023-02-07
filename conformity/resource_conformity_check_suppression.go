@@ -39,6 +39,12 @@ func resourceConformityCheckSuppression() *schema.Resource {
 					regexp.MustCompile("^(\\w+)-(\\d+)$"),
 					"'rule_id' is not in a valid format."),
 			},
+			"service": {
+				Type:        schema.TypeString,
+				Required:    false,
+				Description: "Name of the service of the rule. Example: 'Resources'",
+				ForceNew:    true,
+			},
 			"region": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -82,10 +88,18 @@ func resourceConformityCheckSuppression() *schema.Resource {
 func resourceConformityCheckSuppressionCreate(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*cloudconformity.Client)
 
+	serviceArg := d.Get("service").(string)
+	var service string
+	if len(serviceArg) > 0 {
+		service = serviceArg
+	} else {
+		service = strings.Split(d.Get("rule_id").(string), "-")[0]
+	}
+
 	checkId := fmt.Sprintf("ccc:%s:%s:%s:%s:%s",
 		d.Get("account_id").(string),
 		d.Get("rule_id").(string),
-		strings.Split(d.Get("rule_id").(string), "-")[0],
+		service,
 		d.Get("region").(string),
 		d.Get("resource_id").(string),
 	)
